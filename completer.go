@@ -1,10 +1,10 @@
-package main
+package ifcli
 
 import (
 	"github.com/c-bata/go-prompt"
 )
 
-func completer(d prompt.Document) []prompt.Suggest {
+func SugCompleter(d prompt.Document) []prompt.Suggest {
 	s := []prompt.Suggest{
 		// A
 		{Text: "ALTER", Description: "..."},

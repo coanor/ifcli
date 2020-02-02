@@ -1,7 +1,6 @@
-package main
+package ifcli
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -9,14 +8,15 @@ import (
 	client "github.com/influxdata/influxdb1-client/v2"
 )
 
-func showResp(r *client.Response) {
+func ShowResp(r *client.Response) int {
 
-	switch strings.ToUpper(curFMT) {
+	switch strings.ToUpper(CurFMT) {
 	case `JSON`:
-		jsonShow(r)
+		// not IMPL
 	default:
-		defaultShow(r)
+		return defaultShow(r)
 	}
+	return 0
 }
 
 func getMaxColLen(r *models.Row) int {
@@ -30,39 +30,42 @@ func getMaxColLen(r *models.Row) int {
 	return maxColLen
 }
 
-func defaultShow(r *client.Response) {
+func defaultShow(r *client.Response) int {
+
+	nrows := 0
 
 	for _, res := range r.Results {
 		for _, s := range res.Series {
 
 			switch len(s.Columns) {
 			case 1:
+				fmt.Printf("%s\n", s.Name)
+				fmt.Println("--------------")
 				for _, val := range s.Values {
 					fmt.Println(val[0])
+					nrows++
 				}
+
 			default:
 				maxColLen := getMaxColLen(&s)
 				fmtStr := "%" + fmt.Sprintf("%d", maxColLen) + "s\t%v\n"
 
 				for _, val := range s.Values {
+
+					nrows++
+					fmt.Printf("-=-=-=-=-=-=-=-=[ %d. Row ]-=-=-=-=-=-=-=-=-\n", nrows)
+
 					for colIdx, _ := range s.Columns {
-						if disableNil && val[colIdx] == nil {
+						if DisableNil && val[colIdx] == nil {
 							continue
 						}
 
 						fmt.Printf(fmtStr, s.Columns[colIdx], val[colIdx])
 					}
-
-					fmt.Printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n")
 				}
 			}
 		}
 	}
-}
 
-func jsonShow(r *client.Response) {
-	j, err := json.Marshal(r)
-	if err == nil {
-		fmt.Printf("%s", string(j))
-	}
+	return nrows
 }

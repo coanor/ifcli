@@ -4,11 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"strings"
 
 	"github.com/c-bata/go-prompt"
+	"github.com/c-bata/go-prompt/completer"
 	_ "github.com/influxdata/influxdb1-client" // this is important because of the bug in go mod
 	client "github.com/influxdata/influxdb1-client/v2"
+
+	"github.com/coanor/ifcli"
 )
 
 var (
@@ -20,20 +22,16 @@ var (
 	flagDisableNil = flag.Bool(`disable-nil`, false, ``)
 )
 
-var (
-	curDB      = ``
-	curFMT     = `` // not used
-	disableNil = false
-)
-
 func main() {
 	flag.Parse()
 
 	if *flagDisableNil {
-		disableNil = true
+		ifcli.DisableNil = true
 	}
 
-	c, err := client.NewHTTPClient(client.HTTPConfig{
+	var err error
+
+	ifcli.IflxCli, err = client.NewHTTPClient(client.HTTPConfig{
 		Addr:      *flagHost,
 		Username:  *flagUser,
 		Password:  *flagPassword,
@@ -44,58 +42,22 @@ func main() {
 		log.Fatal(err)
 	}
 
+	fmt.Println("Please use `EXIT|exit|Q|q` to exit this program.")
+	defer fmt.Println("Bye!")
+
 	if *flagDB != `` {
-		curDB = *flagDB
+		ifcli.CurDB = *flagDB
 	}
 
-	promptStr := *flagPrompt + "." + curDB + " > "
+	p := prompt.New(
+		ifcli.Executor,
+		ifcli.SugCompleter,
+		prompt.OptionTitle("ifcli: interactive InfluxDB client"),
+		prompt.OptionPrefix(ifcli.PromptStr),
+		prompt.OptionLivePrefix(ifcli.LivePromptPrefix),
+		prompt.OptionInputTextColor(prompt.Yellow),
+		prompt.OptionCompletionWordSeparator(completer.FilePathCompletionSeparator),
+	)
 
-	for {
-	goon:
-		t := prompt.Input(promptStr, completer, prompt.OptionSwitchKeyBindMode(prompt.EmacsKeyBind))
-
-		t = strings.TrimSpace(t)
-
-		switch strings.ToUpper(t) {
-		case `EXIT`, `Q`:
-			return
-
-		case ``: // ignore empty line
-			goto goon
-
-		case `ENABLE_NIL`:
-			disableNil = false
-			goto goon
-
-		case `DISABLE_NIL`:
-			disableNil = true
-			goto goon
-
-		default:
-			// pass
-			if strings.HasPrefix(strings.ToUpper(t), `USE`) {
-				t = strings.Join(strings.Fields(t), " ") // remove dup spaces
-				elems := strings.Split(t, " ")
-				if len(elems) != 2 {
-					log.Printf("[error] invalid USE statement")
-					goto goon
-				}
-
-				curDB = elems[1]
-				promptStr = *flagPrompt + "." + curDB + " > "
-				goto goon
-			}
-		}
-
-		q := client.NewQuery(t, curDB, ``)
-		if resp, err := c.Query(q); err == nil && resp.Error() == nil {
-			showResp(resp)
-		} else {
-			if err == nil {
-				fmt.Printf("[error] resp Err: %s\n", resp.Error())
-			} else {
-				fmt.Printf("[error] %s, resp Err: %s\n", err.Error(), resp.Error())
-			}
-		}
-	}
+	p.Run()
 }
