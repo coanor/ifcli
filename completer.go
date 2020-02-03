@@ -1,8 +1,6 @@
 package ifcli
 
 import (
-	"fmt"
-
 	"github.com/c-bata/go-prompt"
 )
 
@@ -108,15 +106,10 @@ func AddSug(key string) {
 // remove additional suggestions
 func ResetSug() {
 
-	fmt.Printf("[debug] len(sug): %d\n", len(suggestions))
-
 	sug := []prompt.Suggest{}
 	for _, s := range suggestions {
 		if ok, _ := additionalSugKey[s.Text]; !ok {
-			fmt.Printf("[debug] keep sug <%s>\n", s.Text)
 			sug = append(sug, s)
-		} else {
-			fmt.Printf("[debug] remove sug <%s>\n", s.Text)
 		}
 
 	}
@@ -124,8 +117,6 @@ func ResetSug() {
 	additionalSugKey = map[string]bool{}
 	suggestions = suggestions[:]
 	suggestions = sug
-
-	fmt.Printf("[debug] after reset len(sug): %d\n", len(suggestions))
 }
 
 func SugCompleter(d prompt.Document) []prompt.Suggest {
