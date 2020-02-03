@@ -1,11 +1,15 @@
 package ifcli
 
 import (
+	"fmt"
+
 	"github.com/c-bata/go-prompt"
 )
 
-func SugCompleter(d prompt.Document) []prompt.Suggest {
-	s := []prompt.Suggest{
+var (
+	additionalSugKey = map[string]bool{}
+
+	suggestions = []prompt.Suggest{
 		// A
 		{Text: "ALTER", Description: "..."},
 
@@ -84,8 +88,52 @@ func SugCompleter(d prompt.Document) []prompt.Suggest {
 		// self key words
 		{Text: "ENABLE_NIL", Description: "..."},
 		{Text: "DISABLE_NIL", Description: "..."},
-		{Text: "USE", Description: "..."}, // switch databases
+		{Text: "RESET_SUG", Description: "..."}, // remove suggestions
+		{Text: "USE", Description: "..."},       // switch databases
+
+		// additional suggestions
+	}
+)
+
+func AddSug(key string) {
+	if ok, _ := additionalSugKey[key]; !ok {
+		suggestions = append(suggestions, prompt.Suggest{
+			Text: key, Description: "---",
+		})
+
+		additionalSugKey[key] = true
+	}
+}
+
+// remove additional suggestions
+func ResetSug() {
+
+	fmt.Printf("[debug] len(sug): %d\n", len(suggestions))
+
+	sug := []prompt.Suggest{}
+	for _, s := range suggestions {
+		if ok, _ := additionalSugKey[s.Text]; !ok {
+			fmt.Printf("[debug] keep sug <%s>\n", s.Text)
+			sug = append(sug, s)
+		} else {
+			fmt.Printf("[debug] remove sug <%s>\n", s.Text)
+		}
+
 	}
 
-	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
+	additionalSugKey = map[string]bool{}
+	suggestions = suggestions[:]
+	suggestions = sug
+
+	fmt.Printf("[debug] after reset len(sug): %d\n", len(suggestions))
+}
+
+func SugCompleter(d prompt.Document) []prompt.Suggest {
+
+	w := d.GetWordBeforeCursor()
+	if w == "" {
+		return []prompt.Suggest{}
+	}
+
+	return prompt.FilterHasPrefix(suggestions, w, true)
 }

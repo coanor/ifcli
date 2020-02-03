@@ -29,6 +29,10 @@ func Executor(t string) {
 		DisableNil = true
 		return
 
+	case `RESET_SUG`:
+		ResetSug()
+		return
+
 	default:
 		// pass
 		if strings.HasPrefix(strings.ToUpper(t), `USE`) {

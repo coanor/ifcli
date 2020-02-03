@@ -42,6 +42,13 @@ func defaultShow(r *client.Response) int {
 				fmt.Printf("%s\n", s.Name)
 				fmt.Println("--------------")
 				for _, val := range s.Values {
+					// measurements or dbs, we can add them as suggestions
+
+					switch val[0].(type) {
+					case string:
+						AddSug(val[0].(string))
+					}
+
 					fmt.Println(val[0])
 					nrows++
 				}
@@ -61,6 +68,8 @@ func defaultShow(r *client.Response) int {
 						}
 
 						fmt.Printf(fmtStr, s.Columns[colIdx], val[colIdx])
+
+						AddSug(s.Columns[colIdx])
 					}
 				}
 			}
