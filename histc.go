@@ -80,6 +80,7 @@ type Conn struct {
 	Password          string `toml:"-"`
 	PasswordEncrypted string `toml:"password"`
 	DefaultDB         string `toml:"default_db"`
+	Prompt            string `toml:"prompt"`
 
 	curDB string        `toml:"-"`
 	cli   client.Client `toml:"-"`
@@ -135,6 +136,11 @@ func (c *Conn) Key() string {
 }
 
 func DoQuery(t string) {
+
+	if curConn == nil {
+		fmt.Printf("not connected :(\n")
+		return
+	}
 
 	q := client.NewQuery(t, curConn.curDB, ``)
 	start := time.Now()

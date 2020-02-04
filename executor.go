@@ -52,7 +52,6 @@ func Executor(t string) {
 			}
 
 			curConn.curDB = elems[1]
-			PromptStr = Prompt + "." + curConn.curDB + " > "
 			return
 		} else if strings.HasPrefix(strings.ToUpper(t), `CONN`) { // connect to another influxdb
 			elems := strings.SplitN(t, " ", 2)

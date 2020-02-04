@@ -28,10 +28,6 @@ func main() {
 		ifcli.DisableNil = true
 	}
 
-	if *flagPrompt != "" {
-		ifcli.Prompt = *flagPrompt
-	}
-
 	ifcli.LoadHist()
 
 	if *flagHost != "" {
@@ -41,6 +37,7 @@ func main() {
 			Password:  *flagPassword,
 			DefaultDB: *flagDB,
 			Created:   time.Now(),
+			Prompt:    *flagPrompt,
 		}
 
 		if err := c.Connect(); err != nil {

@@ -8,23 +8,22 @@ var (
 	CurFMT     = `` // not used
 	DisableNil = false
 	PromptStr  string
-	Prompt     = `influx-cli`
 
 	IflxCli client.Client
 )
 
 func LivePromptPrefix() (string, bool) {
 	if curConn == nil {
-		PromptStr = Prompt + "." + `[not connected]` + " > "
+		PromptStr = "influx-cli." + `[not connected]` + " > "
 		return PromptStr, true
 	}
 
 	switch curConn.curDB {
 	case ``:
-		PromptStr = Prompt + "." + `[no DB]` + " > "
+		PromptStr = curConn.Prompt + "." + `[no DB]` + " > "
 		return PromptStr, true
 	default:
-		PromptStr = Prompt + "." + curConn.curDB + " > "
+		PromptStr = curConn.Prompt + "." + curConn.curDB + " > "
 		return PromptStr, true
 	}
 }
