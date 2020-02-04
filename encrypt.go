@@ -11,10 +11,23 @@ import (
 	"io"
 )
 
+var (
+	pwd = `|r0;]$([M7mOL}ycQDuE`
+)
+
 func createHash(key string) string {
 	hasher := md5.New()
 	hasher.Write([]byte(key))
 	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func DoEncrypt(s string) (string, error) {
+	en, err := encrypt([]byte(s), pwd)
+	if err != nil {
+		return "", nil
+	}
+
+	return hex.EncodeToString(en), nil
 }
 
 func encrypt(data []byte, passphrase string) ([]byte, error) {

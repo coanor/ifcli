@@ -3,8 +3,6 @@ github.com/BurntSushi/toml
 # github.com/c-bata/go-prompt v0.2.3
 github.com/c-bata/go-prompt
 github.com/c-bata/go-prompt/completer
-# github.com/gofrs/flock v0.7.1
-github.com/gofrs/flock
 # github.com/influxdata/influxdb1-client v0.0.0-20191209144304-8bf82d3c094d
 github.com/influxdata/influxdb1-client
 github.com/influxdata/influxdb1-client/models

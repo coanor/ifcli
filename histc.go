@@ -12,34 +12,43 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/gofrs/flock"
 	_ "github.com/influxdata/influxdb1-client" // this is important because of the bug in go mod
 	client "github.com/influxdata/influxdb1-client/v2"
 )
 
 var (
 	curConnections       = map[string]*Conn{}
-	pwd                  = `|r0;]$([M7mOL}ycQDuE`
 	curConn        *Conn = nil
+
+	ifclirc = ""
 )
+
+func SetIfCliRC(s string) error {
+	if _, err := os.Stat(s); err != nil {
+		return err
+	}
+
+	ifclirc = s
+	fmt.Printf("use %s as ifclirc\n", ifclirc)
+	return nil
+}
 
 func LoadHist() {
 
-	u, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
+	if ifclirc == "" {
+		u, err := user.Current()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		ifclirc = path.Join(u.HomeDir, `.ifclirc`)
+		fmt.Printf("use %s as ifclirc\n", ifclirc)
 	}
 
-	rcfile := path.Join(u.HomeDir, `.ifclirc`)
-
-	flk := lock(rcfile)
-
-	data, err := ioutil.ReadFile(path.Join(u.HomeDir, `.ifclirc`))
+	data, err := ioutil.ReadFile(ifclirc)
 	if err != nil {
 		return // ignore
 	}
-
-	flk.Unlock()
 
 	histConn := map[string]*Conn{}
 	if err := toml.Unmarshal(data, &histConn); err != nil {
@@ -113,6 +122,8 @@ func (c *Conn) Connect() error {
 
 	// update current working connection
 	curConn = c
+
+	fmt.Printf("conect to %s ok\n", c.Key())
 	return nil
 }
 
@@ -158,23 +169,6 @@ func DoQuery(t string) {
 	}
 }
 
-func lock(f string) *flock.Flock {
-
-	flk := flock.New(f)
-
-	for {
-		locked, err := flk.TryLock()
-		if err != nil {
-			time.Sleep(time.Second)
-			continue
-		} else {
-			if locked {
-				return flk
-			}
-		}
-	}
-}
-
 // for exists connection, update it, or add it
 func AddConn(c *Conn) error {
 
@@ -201,17 +195,7 @@ func AddConn(c *Conn) error {
 		return err
 	}
 
-	u, err := user.Current()
-	if err != nil {
-		return err
-	}
-
-	rcfile := path.Join(u.HomeDir, `.ifclirc`)
-
-	flk := lock(rcfile)
-	defer flk.Unlock()
-
-	f, err := os.OpenFile(rcfile, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	f, err := os.OpenFile(ifclirc, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}

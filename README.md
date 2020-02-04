@@ -41,13 +41,14 @@ We can use `CONN <influxdb-instance-key>` to switch between different InfluxDB i
 
 ## Additional Commands
 
-Additional commands are supported to make your happy:
+Additional commands/tips to make your happy:
 
 - `DISABLE_NIL/ENABLE_NIL`: disalbe/enable `nil` value in console ouput
 - `RESET_SUG`: It will add completer on measurement-name/db-name/field-name/tag-name, this may make the completer table too long and cause performance problem, use the command to clean these real-time-added completers, only keep InfluxDB reserved keyworkds
 - Use `↑` and `↓` to select history. There is no such `~/ifcli-history` file, after `ifcli` exit, all history disappear
 - Use `CONN ...` to switch between different InfluxDB instances
-- Support Emacs-style line operation, such as `ctrl+w` to delete the word before the cursor, `ctrl+e` move cursor to line end, and so on
+- Support Emacs-style line operation, such as `ctrl+w` to delete the word before the cursor, `ctrl+e` to move cursor to line end, `ctrl+l` to clean screen, and so on
+- Windows support(recommand `cmd.exe` or `powershell.exe`, other terminal not tested)
 
 ## Demo
 

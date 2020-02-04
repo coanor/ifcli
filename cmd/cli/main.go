@@ -13,19 +13,41 @@ import (
 )
 
 var (
-	flagHost       = flag.String("host", ``, ``)
-	flagUser       = flag.String(`user`, ``, ``)
-	flagPassword   = flag.String(`pwd`, ``, ``)
-	flagDB         = flag.String(`db`, ``, ``)
-	flagPrompt     = flag.String("prompt", "influx-cli", ``)
-	flagDisableNil = flag.Bool(`disable-nil`, false, ``)
+	flagHost     = flag.String("host", ``, `InfluxDB host, format: http[s]://<host>:port`)
+	flagUser     = flag.String(`user`, ``, `InfluxDB user name`)
+	flagPassword = flag.String(`pwd`, ``, `InfluxDB password`)
+	flagDB       = flag.String(`db`, ``, `set connection default DB name`)
+
+	flagPrompt     = flag.String("prompt", "influx-cli", `set connection prompt string`)
+	flagDisableNil = flag.Bool(`disable-nil`, false, `when show InfluxDB data, disable nil print, you can switch it during run time`)
+
+	flagEncrypt = flag.String("encrypt", ``, `used to update InfluxDB password in .ifclirc`)
+	flagIfCliRC = flag.String(`ifclirc`, ``, `use specified .ifclirc path instead of ~/.ifclirc`)
 )
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	flag.Parse()
+
+	if *flagEncrypt != "" {
+		en, err := ifcli.DoEncrypt(*flagEncrypt)
+		if err != nil {
+			fmt.Printf("failed to encrypt: %s\n", err.Error())
+		} else {
+			fmt.Println(en)
+		}
+
+		return
+	}
 
 	if *flagDisableNil {
 		ifcli.DisableNil = true
+	}
+
+	if *flagIfCliRC != "" {
+		if err := ifcli.SetIfCliRC(*flagIfCliRC); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	ifcli.LoadHist()
