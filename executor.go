@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
-
-	client "github.com/influxdata/influxdb1-client/v2"
 )
 
 func Executor(t string) {
@@ -15,6 +12,10 @@ func Executor(t string) {
 
 	switch strings.ToUpper(t) {
 	case `EXIT`, `Q`:
+		if curConn != nil {
+			curConn.Close()
+		}
+
 		fmt.Println("Bye!")
 		os.Exit(0)
 
@@ -34,33 +35,47 @@ func Executor(t string) {
 		return
 
 	default:
+
+		t = strings.Join(strings.Fields(t), " ") // remove dup spaces
+
 		// pass
 		if strings.HasPrefix(strings.ToUpper(t), `USE`) {
-			t = strings.Join(strings.Fields(t), " ") // remove dup spaces
-			elems := strings.Split(t, " ")
+			elems := strings.SplitN(t, " ", 2)
 			if len(elems) != 2 {
 				fmt.Println("[error] invalid USE statement")
 				return
 			}
 
-			CurDB = elems[1]
-			PromptStr = Prompt + "." + CurDB + " > "
+			if curConn == nil {
+				fmt.Println("[error] not connected")
+				return
+			}
+
+			curConn.curDB = elems[1]
+			PromptStr = Prompt + "." + curConn.curDB + " > "
+			return
+		} else if strings.HasPrefix(strings.ToUpper(t), `CONN`) { // connect to another influxdb
+			elems := strings.SplitN(t, " ", 2)
+			if len(elems) != 2 {
+				fmt.Println("[error] invalid CONN statement")
+				return
+			}
+
+			c, ok := curConnections[elems[1]]
+			if !ok {
+				fmt.Printf("[error] CONN %s not exist", elems[1])
+				return
+			}
+
+			if err := c.Connect(); err != nil {
+				fmt.Printf("[error] connect to %s failed: %s", c.Key(), err.Error())
+				return
+			}
+
 			return
 		}
 	}
 
-	q := client.NewQuery(t, CurDB, ``)
-	start := time.Now()
+	DoQuery(t)
 
-	if resp, err := IflxCli.Query(q); err == nil && resp.Error() == nil {
-		n := ShowResp(resp)
-		fmt.Printf("\n%d rows in set\n", n)
-		fmt.Printf("time: %v\n", time.Since(start))
-	} else {
-		if err == nil {
-			fmt.Printf("[error] resp Err: %s\n", resp.Error())
-		} else {
-			fmt.Printf("[error] %s, resp Err: %s\n", err.Error(), resp.Error())
-		}
-	}
 }

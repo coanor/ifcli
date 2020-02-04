@@ -131,6 +131,7 @@ var (
 
 		// T
 		{Text: "TAG", Description: "..."},
+		{Text: "time", Description: "..."}, // all measurement got time filed
 		{Text: "TO", Description: "..."},
 
 		// U
@@ -150,10 +151,11 @@ var (
 		// Z
 
 		// self key words
-		{Text: "ENABLE_NIL", Description: "..."},
-		{Text: "DISABLE_NIL", Description: "..."},
-		{Text: "RESET_SUG", Description: "..."}, // remove suggestions
-		{Text: "USE", Description: "..."},       // switch databases
+		{Text: "ENABLE_NIL", Description: "enable show nil values"},
+		{Text: "EXIT", Description: "exit client"},
+		{Text: "DISABLE_NIL", Description: "disable show nil values"},
+		{Text: "RESET_SUG", Description: "clean dynamic suggestions"}, // remove suggestions
+		{Text: "USE", Description: "switch to another database"},      // switch databases
 
 		// additional suggestions
 	}

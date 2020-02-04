@@ -4,11 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/c-bata/go-prompt"
 	"github.com/c-bata/go-prompt/completer"
-	_ "github.com/influxdata/influxdb1-client" // this is important because of the bug in go mod
-	client "github.com/influxdata/influxdb1-client/v2"
 
 	"github.com/coanor/ifcli"
 )
@@ -18,7 +17,7 @@ var (
 	flagUser       = flag.String(`user`, ``, ``)
 	flagPassword   = flag.String(`pwd`, ``, ``)
 	flagDB         = flag.String(`db`, ``, ``)
-	flagPrompt     = flag.String("prompt", "influx-cli ", ``)
+	flagPrompt     = flag.String("prompt", "influx-cli", ``)
 	flagDisableNil = flag.Bool(`disable-nil`, false, ``)
 )
 
@@ -29,25 +28,28 @@ func main() {
 		ifcli.DisableNil = true
 	}
 
-	var err error
+	if *flagPrompt != "" {
+		ifcli.Prompt = *flagPrompt
+	}
 
-	ifcli.IflxCli, err = client.NewHTTPClient(client.HTTPConfig{
-		Addr:      *flagHost,
-		Username:  *flagUser,
-		Password:  *flagPassword,
-		UserAgent: "ifcli",
-	})
+	ifcli.LoadHist()
 
-	if err != nil {
-		log.Fatal(err)
+	if *flagHost != "" {
+		c := &ifcli.Conn{
+			Host:      *flagHost,
+			User:      *flagUser,
+			Password:  *flagPassword,
+			DefaultDB: *flagDB,
+			Created:   time.Now(),
+		}
+
+		if err := c.Connect(); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	fmt.Println("Please use `EXIT|exit|Q|q` to exit this program.")
 	defer fmt.Println("Bye!")
-
-	if *flagDB != `` {
-		ifcli.CurDB = *flagDB
-	}
 
 	p := prompt.New(
 		ifcli.Executor,

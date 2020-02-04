@@ -5,7 +5,6 @@ import (
 )
 
 var (
-	CurDB      = ``
 	CurFMT     = `` // not used
 	DisableNil = false
 	PromptStr  string
@@ -15,12 +14,17 @@ var (
 )
 
 func LivePromptPrefix() (string, bool) {
-	switch CurDB {
+	if curConn == nil {
+		PromptStr = Prompt + "." + `[not connected]` + " > "
+		return PromptStr, true
+	}
+
+	switch curConn.curDB {
 	case ``:
-		PromptStr = Prompt + "." + `<no DB>` + " > "
+		PromptStr = Prompt + "." + `[no DB]` + " > "
 		return PromptStr, true
 	default:
-		PromptStr = Prompt + "." + CurDB + " > "
+		PromptStr = Prompt + "." + curConn.curDB + " > "
 		return PromptStr, true
 	}
 }

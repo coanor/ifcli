@@ -1,6 +1,10 @@
+# github.com/BurntSushi/toml v0.3.1
+github.com/BurntSushi/toml
 # github.com/c-bata/go-prompt v0.2.3
 github.com/c-bata/go-prompt
 github.com/c-bata/go-prompt/completer
+# github.com/gofrs/flock v0.7.1
+github.com/gofrs/flock
 # github.com/influxdata/influxdb1-client v0.0.0-20191209144304-8bf82d3c094d
 github.com/influxdata/influxdb1-client
 github.com/influxdata/influxdb1-client/models
@@ -16,5 +20,5 @@ github.com/mattn/go-runewidth
 github.com/mattn/go-tty
 # github.com/pkg/term v0.0.0-20190109203006-aa71e9d9e942
 github.com/pkg/term/termios
-# golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9
+# golang.org/x/sys v0.0.0-20191120155948-bd437916bb0e
 golang.org/x/sys/unix
