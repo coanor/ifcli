@@ -143,7 +143,7 @@ func (c *Conn) Close() error {
 }
 
 func (c *Conn) Key() string {
-	return c.User + "::" + c.Host
+	return c.User + "::" + c.Prompt
 }
 
 func DoQuery(t string) {

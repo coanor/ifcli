@@ -7,22 +7,7 @@ import (
 var (
 	additionalSugKey = map[string]bool{}
 
-	/*
-		ALL           ALTER         ANALYZE       ANY           AS            ASC
-		BEGIN         BY            CREATE        CONTINUOUS    DATABASE      DATABASES
-		DEFAULT       DELETE        DESC          DESTINATIONS  DIAGNOSTICS   DISTINCT
-		DROP          DURATION      END           EVERY         EXPLAIN       FIELD
-		FOR           FROM          GRANT         GRANTS        GROUP         GROUPS
-		IN            INF           INSERT        INTO          KEY           KEYS
-		KILL          LIMIT         SHOW          MEASUREMENT   MEASUREMENTS  NAME
-		OFFSET        ON            ORDER         PASSWORD      POLICY        POLICIES
-		PRIVILEGES    QUERIES       QUERY         READ          REPLICATION   RESAMPLE
-		RETENTION     REVOKE        SELECT        SERIES        SET           SHARD
-		SHARDS        SLIMIT        SOFFSET       STATS         SUBSCRIPTION  SUBSCRIPTIONS
-		TAG           TO            USER          USERS         VALUES        WHERE
-		WITH          WRITE
-	*/
-
+	// See keywords list: https://github.com/influxdata/influxql#keywords
 	suggestions = []prompt.Suggest{
 		// A
 		{Text: "ALTER", Description: "..."},
@@ -190,9 +175,11 @@ func ResetSug() {
 func SugCompleter(d prompt.Document) []prompt.Suggest {
 
 	w := d.GetWordBeforeCursor()
-	if w == "" {
-		return []prompt.Suggest{}
-	}
 
-	return prompt.FilterHasPrefix(suggestions, w, true)
+	switch w {
+	case "":
+		return []prompt.Suggest{}
+	default:
+		return prompt.FilterHasPrefix(suggestions, w, true)
+	}
 }
