@@ -2,10 +2,17 @@ package ifcli
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"strings"
 
 	"github.com/influxdata/influxdb1-client/models"
 	client "github.com/influxdata/influxdb1-client/v2"
+)
+
+var (
+	tee     io.Writer
+	teeFile *os.File
 )
 
 func ShowResp(r *client.Response) int {
@@ -39,8 +46,8 @@ func defaultShow(r *client.Response) int {
 
 			switch len(s.Columns) {
 			case 1:
-				fmt.Printf("%s\n", s.Name)
-				fmt.Println("--------------")
+				showFmtLine("%s\n", s.Name)
+				showLine("--------------")
 				for _, val := range s.Values {
 					// measurements or dbs, we can add them as suggestions
 
@@ -49,7 +56,7 @@ func defaultShow(r *client.Response) int {
 						AddSug(val[0].(string))
 					}
 
-					fmt.Println(val[0])
+					showLine(val[0])
 					nrows++
 				}
 
@@ -60,14 +67,14 @@ func defaultShow(r *client.Response) int {
 				for _, val := range s.Values {
 
 					nrows++
-					fmt.Printf("-=-=-=-=-=-=-=-=[ %d. Row ]-=-=-=-=-=-=-=-=-\n", nrows)
+					showFmtLine("-=-=-=-=-=-=-=-=[ %d. Row ]-=-=-=-=-=-=-=-=-\n", nrows)
 
 					for colIdx, _ := range s.Columns {
 						if DisableNil && val[colIdx] == nil {
 							continue
 						}
 
-						fmt.Printf(fmtStr, s.Columns[colIdx], val[colIdx])
+						showFmtLine(fmtStr, s.Columns[colIdx], val[colIdx])
 
 						AddSug(s.Columns[colIdx])
 					}
@@ -77,4 +84,20 @@ func defaultShow(r *client.Response) int {
 	}
 
 	return nrows
+}
+
+func showFmtLine(fmtStr string, args ...interface{}) {
+	if tee == nil {
+		fmt.Printf(fmtStr, args...)
+	} else {
+		fmt.Fprintf(tee, fmtStr, args...)
+	}
+}
+
+func showLine(args ...interface{}) {
+	if tee == nil {
+		fmt.Println(args...)
+	} else {
+		fmt.Fprintln(tee, args...)
+	}
 }

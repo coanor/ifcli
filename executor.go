@@ -2,6 +2,7 @@ package ifcli
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 )
@@ -35,46 +36,83 @@ func Executor(t string) {
 		return
 
 	default:
-
 		t = strings.Join(strings.Fields(t), " ") // remove dup spaces
 
 		// pass
 		if strings.HasPrefix(strings.ToUpper(t), `USE`) {
-			elems := strings.SplitN(t, " ", 2)
-			if len(elems) != 2 {
-				fmt.Println("[error] invalid USE statement")
-				return
-			}
-
-			if curConn == nil {
-				fmt.Println("[error] not connected")
-				return
-			}
-
-			curConn.curDB = elems[1]
+			handleUseStmt(t)
 			return
-		} else if strings.HasPrefix(strings.ToUpper(t), `CONN`) { // connect to another influxdb
-			elems := strings.SplitN(t, " ", 2)
-			if len(elems) != 2 {
-				fmt.Println("[error] invalid CONN statement")
-				return
-			}
+		}
 
-			c, ok := curConnections[elems[1]]
-			if !ok {
-				fmt.Printf("[error] CONN %s not exist", elems[1])
-				return
-			}
+		if strings.HasPrefix(strings.ToUpper(t), `CONN`) { // connect to another influxdb
+			handleUseStmt(t)
+			return
+		}
 
-			if err := c.Connect(); err != nil {
-				fmt.Printf("[error] connect to %s failed: %s", c.Key(), err.Error())
-				return
-			}
-
+		if strings.HasPrefix(strings.ToUpper(t), `TEE`) { // forward output to another file
+			handleTeeStmt(t)
 			return
 		}
 	}
 
 	DoQuery(t)
+}
 
+func handleTeeStmt(t string) {
+	var err error
+	elems := strings.SplitN(t, " ", 2)
+	if len(elems) != 2 {
+		fmt.Println("[error] invalid TEE statement")
+		return
+	}
+
+	if teeFile != nil {
+		teeFile.Close()
+	}
+
+	teeFile, err = os.Create(elems[1])
+	if err != nil {
+		fmt.Printf("[error] %s", err.Error())
+		return
+	}
+
+	tee = io.MultiWriter(os.Stdout, teeFile)
+}
+
+func handleUseStmt(t string) {
+
+	elems := strings.SplitN(t, " ", 2)
+	if len(elems) != 2 {
+		fmt.Println("[error] invalid USE statement")
+		return
+	}
+
+	if curConn == nil {
+		fmt.Println("[error] not connected")
+		return
+	}
+
+	curConn.curDB = elems[1]
+	return
+}
+
+func handleConnStmt(t string) {
+	elems := strings.SplitN(t, " ", 2)
+	if len(elems) != 2 {
+		fmt.Println("[error] invalid CONN statement")
+		return
+	}
+
+	c, ok := curConnections[elems[1]]
+	if !ok {
+		fmt.Printf("[error] CONN %s not exist", elems[1])
+		return
+	}
+
+	if err := c.Connect(); err != nil {
+		fmt.Printf("[error] connect to %s failed: %s", c.Key(), err.Error())
+		return
+	}
+
+	return
 }
