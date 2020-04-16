@@ -49,6 +49,7 @@ Additional commands/tips to make your happy:
 - Use `CONN ...` to switch between different InfluxDB instances
 - Support Emacs-style line operation, such as `ctrl+w` to delete the word before the cursor, `ctrl+e` to move cursor to line end, `ctrl+l` to clean screen, and so on
 - Windows support(recommand `cmd.exe` or `powershell.exe`, other terminal not tested)
+- Use `tee output.file` to redirect output to file
 
 ## Demo
 
