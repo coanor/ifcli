@@ -84,21 +84,18 @@ func handleMoveStmt(t string) {
 func handleTscntStmt(t string) {
 
 	elems := strings.Split(t, " ")
-	latest := `5m` // default
 	db := curConn.curDB
 
 	switch len(elems) {
-	case 3:
-		latest = elems[2]
 	case 2:
 		db = elems[1]
 	case 1:
 	default:
-		fmt.Println("[error] invalid TSCNT statement: TSCNT <dbname> <latest>(default 5m)")
+		fmt.Println("[error] invalid TSCNT statement: TSCNT <dbname>")
 		return
 	}
 
-	q := fmt.Sprintf(`SELECT "numSeries" FROM _internal.."database" WHERE "database"='%s' AND time > (NOW()-%s) ORDER BY time DESC LIMIT 1`, db, latest)
+	q := fmt.Sprintf(`SELECT LAST("numSeries") FROM _internal.."database" WHERE "database"='%s'`, db)
 	DoQuery(q)
 }
 
