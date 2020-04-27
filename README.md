@@ -50,6 +50,7 @@ Additional commands/tips to make your happy:
 - Support Emacs-style line operation, such as `ctrl+w` to delete the word before the cursor, `ctrl+e` to move cursor to line end, `ctrl+l` to clean screen, and so on
 - Windows support(recommand `cmd.exe` or `powershell.exe`, other terminal not tested)
 - Use `tee output.file` to redirect output to file
+- Use `TSCNT <db-name> <since-when>` to show DB's time series count. If `db-name` not sepcified, use current DB (if set); if `since-when` not set, default to `5m` (latest 5 minutes)
 
 ## Demo
 

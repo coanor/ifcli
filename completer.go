@@ -139,8 +139,10 @@ var (
 		{Text: "ENABLE_NIL", Description: "enable show nil values"},
 		{Text: "EXIT", Description: "exit client"},
 		{Text: "DISABLE_NIL", Description: "disable show nil values"},
-		{Text: "RESET_SUG", Description: "clean dynamic suggestions"}, // remove suggestions
-		{Text: "USE", Description: "switch to another database"},      // switch databases
+		{Text: "RESET_SUG", Description: "clean dynamic suggestions"},
+		{Text: "USE", Description: "switch to another database"},
+		{Text: "TSCNT", Description: "show DB series count"},
+		{Text: "TEE", Description: "redirect output to anothere file"},
 
 		// additional suggestions
 	}
