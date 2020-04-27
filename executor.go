@@ -58,9 +58,27 @@ func Executor(t string) {
 			handleTscntStmt(t)
 			return
 		}
+
+		if strings.HasPrefix(strings.ToUpper(t), `MOVE`) { // count series count on DB
+			handleMoveStmt(t)
+			return
+		}
 	}
 
 	DoQuery(t)
+}
+
+func handleMoveStmt(t string) {
+	elems := strings.SplitN(t, " ", 3)
+	switch len(elems) {
+	case 3:
+	default:
+		fmt.Println("[error] invalid MOVE statement: MOVE db.rp.meas-1 db.rp.meas-2")
+		return
+	}
+
+	q := fmt.Sprintf(`SELECT * INTO %s FROM %s GROUP BY *`, elems[2], elems[1])
+	DoQuery(q)
 }
 
 func handleTscntStmt(t string) {

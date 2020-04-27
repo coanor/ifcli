@@ -143,6 +143,7 @@ var (
 		{Text: "USE", Description: "switch to another database"},
 		{Text: "TSCNT", Description: "show DB series count"},
 		{Text: "TEE", Description: "redirect output to anothere file"},
+		{Text: "MOVE", Description: "rename/move measurement among DB/RP"},
 
 		// additional suggestions
 	}
@@ -182,6 +183,7 @@ func SugCompleter(d prompt.Document) []prompt.Suggest {
 	case "":
 		return []prompt.Suggest{}
 	default:
-		return prompt.FilterHasPrefix(suggestions, w, true)
+		sugs := prompt.FilterFuzzy(suggestions, w, true)
+		return sugs
 	}
 }

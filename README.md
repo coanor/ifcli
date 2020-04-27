@@ -2,6 +2,14 @@
 
 A InfluxDB console client, inspired by [mycli](https://github.com/dbcli/mycli).
 
+# Download
+
+Only 64-bit available, if your have 32-bit CPU, you can build your own binary
+
+- [Mac](./bin/mac/ifcli)
+- [Linux](./bin/linux/ifcli)
+- [Windows](./bin/windows/ifcli.exe)
+
 ## Usage:
 
 	./ifcli -host https://<host>:3242 \ # Use http or https
@@ -51,6 +59,7 @@ Additional commands/tips to make your happy:
 - Windows support(recommand `cmd.exe` or `powershell.exe`, other terminal not tested)
 - Use `tee output.file` to redirect output to file
 - Use `TSCNT <db-name> <since-when>` to show DB's time series count. If `db-name` not sepcified, use current DB (if set); if `since-when` not set, default to `5m` (latest 5 minutes)
+- Use `MOVE <db1>.<rp1>.<measurement> <db2>.<rp2>.<measurement2>` to backup data to another databases, or within same DB, with different RP or measurement name
 
 ## Demo
 
