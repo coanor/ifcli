@@ -146,6 +146,35 @@ func (c *Conn) Key() string {
 	return c.User + "::" + c.Prompt
 }
 
+func StatQuery(t string, n int64) {
+
+	if curConn == nil {
+		fmt.Printf("not connected :(\n")
+		return
+	}
+
+	q := client.NewQuery(t, curConn.curDB, ``)
+	start := time.Now()
+	errCnt := 0
+	var maxCost, totalCost time.Duration
+
+	for i := 0; i < int(n); i++ {
+		start_ := time.Now()
+		if resp, err := curConn.cli.Query(q); err == nil && resp.Error() == nil {
+			cost := time.Since(start_)
+			if cost > maxCost {
+				maxCost = cost
+			}
+		} else {
+			errCnt++
+		}
+	}
+
+	totalCost = time.Since(start)
+
+	fmt.Printf("time: total: %v, avg: %v, max: %v\n", totalCost, totalCost/time.Duration(n), maxCost)
+}
+
 func DoQuery(t string) {
 
 	if curConn == nil {

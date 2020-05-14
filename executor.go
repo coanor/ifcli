@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -44,6 +45,16 @@ func Executor(t string) {
 			return
 		}
 
+		if strings.HasPrefix(strings.ToUpper(t), `BENCHN`) { // connect to another influxdb
+			handleBenchNStmt(t)
+			return
+		}
+
+		if strings.HasPrefix(strings.ToUpper(t), `BENCH`) { // connect to another influxdb
+			handleBenchStmt(t)
+			return
+		}
+
 		if strings.HasPrefix(strings.ToUpper(t), `CONN`) { // connect to another influxdb
 			handleUseStmt(t)
 			return
@@ -66,6 +77,36 @@ func Executor(t string) {
 	}
 
 	DoQuery(t)
+}
+
+func handleBenchNStmt(t string) {
+	elems := strings.SplitN(t, " ", 3)
+	switch len(elems) {
+	case 3:
+	default:
+		fmt.Println("[error] invalid BENCH statement: BENCHN <n> <sql-to-bench>")
+		return
+	}
+
+	n, err := strconv.ParseInt(elems[1], 10, 64)
+	if err != nil {
+		fmt.Println("[error] %s", err.Error())
+		return
+	}
+
+	StatQuery(elems[2], n)
+}
+
+func handleBenchStmt(t string) {
+	elems := strings.SplitN(t, " ", 2)
+	switch len(elems) {
+	case 2:
+	default:
+		fmt.Println("[error] invalid BENCH statement: BENCH <sql-to-bench>")
+		return
+	}
+
+	StatQuery(elems[1], 10)
 }
 
 func handleMoveStmt(t string) {

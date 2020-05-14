@@ -144,6 +144,8 @@ var (
 		{Text: "TSCNT", Description: "show DB series count"},
 		{Text: "TEE", Description: "redirect output to anothere file"},
 		{Text: "MOVE", Description: "rename/move measurement among DB/RP"},
+		{Text: "BENCH", Description: "benchmark SQL(default running 10 times)"},
+		{Text: "BENCHN", Description: "benchmark SQL with running specified times"},
 
 		// additional suggestions
 	}
