@@ -155,7 +155,6 @@ func StatQuery(t string, n int64) {
 
 	q := client.NewQuery(t, curConn.curDB, ``)
 	start := time.Now()
-	errCnt := 0
 	var maxCost, totalCost time.Duration
 
 	for i := 0; i < int(n); i++ {
@@ -166,7 +165,12 @@ func StatQuery(t string, n int64) {
 				maxCost = cost
 			}
 		} else {
-			errCnt++
+			if err == nil {
+				fmt.Printf("[error] resp Err: %s\n", resp.Error())
+			} else {
+				fmt.Printf("[error] %s, resp Err: %s\n", err.Error(), resp.Error())
+			}
+			return
 		}
 	}
 

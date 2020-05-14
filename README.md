@@ -61,7 +61,7 @@ Additional commands/tips to make your happy:
 - Use `TSCNT <db-name> <since-when>` to show DB's time series count. If `db-name` not sepcified, use current DB (if set); if `since-when` not set, default to `5m` (latest 5 minutes)
 - Use `MOVE <db1>.<rp1>.<measurement> <db2>.<rp2>.<measurement2>` to backup data to another databases, or within same DB, with different RP or measurement name
 - Use `BENCH <sql>` to benchmark SQL with runing 10 times
-- Use `BENCHN <n> <sql>` to benchmark SQL with running `N` times
+- Use `BENCHN <n> <sql>` to benchmark SQL with running `n` times
 
 ## Demo
 
