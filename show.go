@@ -62,7 +62,7 @@ func defaultShow(r *client.Response) int {
 
 			default:
 				maxColLen := getMaxColLen(&s)
-				fmtStr := "%" + fmt.Sprintf("%d", maxColLen) + "s\t%v\n"
+				fmtStr := fmt.Sprintf("%%%ds%%s", maxColLen) + " %v\n"
 
 				for _, val := range s.Values {
 
@@ -74,7 +74,12 @@ func defaultShow(r *client.Response) int {
 							continue
 						}
 
-						showFmtLine(fmtStr, s.Columns[colIdx], val[colIdx])
+						col := s.Columns[colIdx]
+						if _, ok := s.Tags[col]; ok {
+							showFmtLine(fmtStr, col, "*", val[colIdx])
+						} else {
+							showFmtLine(fmtStr, col, " ", val[colIdx])
+						}
 
 						AddSug(s.Columns[colIdx])
 					}
