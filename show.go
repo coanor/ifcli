@@ -28,6 +28,13 @@ func ShowResp(r *client.Response) int {
 
 func getMaxColLen(r *models.Row) int {
 	maxColLen := 0
+
+	for k, _ := range r.Tags {
+		if len(k) > maxColLen {
+			maxColLen = len(k)
+		}
+	}
+
 	for _, col := range r.Columns {
 		if len(col) > maxColLen {
 			maxColLen = len(col)
@@ -44,10 +51,13 @@ func defaultShow(r *client.Response) int {
 	for _, res := range r.Results {
 		for _, s := range res.Series {
 
+			//showFmtLine("%+#v\n", s)
+
 			switch len(s.Columns) {
 			case 1:
 				showFmtLine("%s\n", s.Name)
 				showLine("--------------")
+
 				for _, val := range s.Values {
 					// measurements or dbs, we can add them as suggestions
 
@@ -68,6 +78,10 @@ func defaultShow(r *client.Response) int {
 
 					nrows++
 					showFmtLine("-=-=-=-=-=-=-=-=[ %d. Row ]-=-=-=-=-=-=-=-=-\n", nrows)
+					for k, v := range s.Tags {
+						showFmtLine(fmtStr, k, "*", v)
+						AddSug(k)
+					}
 
 					for colIdx, _ := range s.Columns {
 						if DisableNil && val[colIdx] == nil {
@@ -75,9 +89,7 @@ func defaultShow(r *client.Response) int {
 						}
 
 						col := s.Columns[colIdx]
-						if _, ok := s.Tags[col]; ok {
-							showFmtLine(fmtStr, col, "*", val[colIdx])
-						} else {
+						if _, ok := s.Tags[col]; !ok { // do not output tag here
 							showFmtLine(fmtStr, col, " ", val[colIdx])
 						}
 
